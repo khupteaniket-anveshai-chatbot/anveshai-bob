@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}About AnveshAI - MPSC Exam Preparation{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-graduation-cap text-primary"></i> About AnveshAI
+                </h1>
+                <p class="lead text-muted">Your Comprehensive MPSC Exam Preparation Platform</p>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="fas fa-bullseye text-primary"></i> Our Mission</h3>
+                    <p class="card-text">
+                        AnveshAI is dedicated to helping MPSC (Maharashtra Public Service Commission) aspirants 
+                        achieve their dreams through comprehensive, exam-oriented study materials. We believe in 
+                        making quality education accessible to everyone preparing for competitive exams.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="fas fa-star text-warning"></i> What We Offer</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong><i class="fas fa-file-alt text-primary"></i> Exam-Oriented Short Notes</strong>
+                            <p class="mb-0 text-muted">Concise, focused notes designed specifically for MPSC exams, 
+                            covering all important topics with clarity and precision.</p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong><i class="fas fa-fire text-danger"></i> Hot Topics Analysis</strong>
+                            <p class="mb-0 text-muted">Identify the most important topics based on Previous Year 
+                            Questions (PYQ) analysis to optimize your preparation strategy.</p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong><i class="fas fa-lightbulb text-success"></i> Exam Tips & Tricks</strong>
+                            <p class="mb-0 text-muted">Expert tips and strategies to help you tackle exam questions 
+                            effectively and avoid common mistakes.</p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong><i class="fas fa-bookmark text-info"></i> Easy Organization</strong>
+                            <p class="mb-0 text-muted">Bookmark your favorite notes and organize your study materials 
+                            for quick access and efficient revision.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="fas fa-users text-success"></i> Who We Are</h3>
+                    <p class="card-text">
+                        We are a team of educators, MPSC experts, and technology enthusiasts committed to 
+                        revolutionizing exam preparation. Our content is carefully curated by subject matter 
+                        experts who understand the MPSC exam pattern and requirements.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-light">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="fas fa-rocket text-primary"></i> Our Vision</h3>
+                    <p class="card-text">
+                        To become the most trusted and comprehensive platform for MPSC exam preparation, 
+                        helping thousands of aspirants achieve their goals and serve the state of Maharashtra 
+                        with dedication and excellence.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <h4 class="mb-4">Ready to Start Your Preparation?</h4>
+                <a href="{% url 'notes:home' %}" class="btn btn-primary btn-lg me-2">
+                    <i class="fas fa-home"></i> Go to Home
+                </a>
+                <a href="{% url 'notes:how_to_use' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-question-circle"></i> How to Use
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

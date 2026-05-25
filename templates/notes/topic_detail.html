@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ topic.title }} - {{ subject.name }} - AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'notes:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'notes:subject_detail' subject.slug %}">{{ subject.name }}</a></li>
+            <li class="breadcrumb-item active">{{ topic.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Topic Header -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h1 class="h2 mb-3">{{ topic.title }}</h1>
+            {% if topic.description %}
+            <p class="lead text-muted">{{ topic.description }}</p>
+            {% endif %}
+            <div class="d-flex gap-2">
+                <span class="badge bg-primary">
+                    <i class="fas fa-book"></i> {{ subject.name }}
+                </span>
+                <span class="badge bg-info">
+                    <i class="fas fa-file-alt"></i> {{ page_obj.paginator.count }} Notes
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-filter"></i> Filter Notes</h5>
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Difficulty</label>
+                    <select name="difficulty" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Levels</option>
+                        <option value="easy" {% if current_difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                        <option value="medium" {% if current_difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="hard" {% if current_difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Importance</label>
+                    <select name="importance" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Levels</option>
+                        <option value="1" {% if current_importance == '1' %}selected{% endif %}>⭐ Low</option>
+                        <option value="2" {% if current_importance == '2' %}selected{% endif %}>⭐⭐ Medium</option>
+                        <option value="3" {% if current_importance == '3' %}selected{% endif %}>⭐⭐⭐ High</option>
+                        <option value="4" {% if current_importance == '4' %}selected{% endif %}>⭐⭐⭐⭐ Very High</option>
+                        <option value="5" {% if current_importance == '5' %}selected{% endif %}>⭐⭐⭐⭐⭐ Critical</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tag</label>
+                    <select name="tag" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Tags</option>
+                        {% for tag in all_tags %}
+                        <option value="{{ tag.slug }}" {% if current_tag == tag.slug %}selected{% endif %}>
+                            {{ tag.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <a href="{% url 'notes:topic_detail' subject.slug topic.slug %}" class="btn btn-secondary w-100">
+                        <i class="fas fa-redo"></i> Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notes Grid -->
+    {% if page_obj %}
+    <div class="row g-4 mb-4">
+        {% for note in page_obj %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <!-- Badges -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge badge-difficulty-{{ note.difficulty_level }}">
+                            {{ note.get_difficulty_level_display }}
+                        </span>
+                        <span class="importance-stars">
+                            {{ note.get_importance_stars }}
+                        </span>
+                    </div>
+
+                    <!-- Title -->
+                    <h5 class="card-title">{{ note.title }}</h5>
+
+                    <!-- Tags -->
+                    {% if note.tags.all %}
+                    <div class="mb-2">
+                        {% for tag in note.tags.all|slice:":3" %}
+                        <span class="badge bg-secondary small">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Meta Info -->
+                    <p class="card-text small text-muted mb-3">
+                        <i class="fas fa-clock"></i> {{ note.estimated_read_time }} min
+                        <i class="fas fa-eye ms-2"></i> {{ note.views_count }} views
+                    </p>
+
+                    <!-- Action Button -->
+                    <a href="{% url 'notes:note_detail' subject.slug topic.slug note.slug %}" 
+                       class="btn btn-primary btn-sm w-100">
+                        Read Note <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if current_importance %}&importance={{ current_importance }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if current_importance %}&importance={{ current_importance }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if current_importance %}&importance={{ current_importance }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if current_importance %}&importance={{ current_importance }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if current_importance %}&importance={{ current_importance }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> No notes found with the selected filters. Try adjusting your filters or check back later!
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

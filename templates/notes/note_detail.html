@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ note.title }} - AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'notes:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'notes:subject_detail' subject.slug %}">{{ subject.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'notes:topic_detail' subject.slug topic.slug %}">{{ topic.title }}</a></li>
+            <li class="breadcrumb-item active">{{ note.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <!-- Note Header -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h1 class="h3 mb-2">{{ note.title }}</h1>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-folder"></i> {{ subject.name }} › {{ topic.title }}
+                            </p>
+                        </div>
+                        <form action="{% url 'notes:toggle_bookmark' note.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger bookmark-btn {% if is_bookmarked %}bookmarked{% endif %}">
+                                <i class="fas fa-bookmark"></i>
+                                {% if is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Metadata Badges -->
+                    <div class="mb-4">
+                        <span class="badge badge-difficulty-{{ note.difficulty_level }} me-2">
+                            <i class="fas fa-signal"></i> {{ note.get_difficulty_level_display }}
+                        </span>
+                        <span class="badge bg-warning text-dark me-2">
+                            <span class="importance-stars">{{ note.get_importance_stars }}</span>
+                        </span>
+                        <span class="badge bg-info text-dark me-2">
+                            <i class="fas fa-clock"></i> {{ note.estimated_read_time }} min read
+                        </span>
+                        <span class="badge bg-secondary">
+                            <i class="fas fa-eye"></i> {{ note.views_count }} views
+                        </span>
+                    </div>
+
+                    <!-- Tags -->
+                    {% if note.tags.all %}
+                    <div class="mb-4">
+                        {% for tag in note.tags.all %}
+                        <span class="badge" style="background-color: {{ tag.color }};">
+                            <i class="fas fa-tag"></i> {{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <!-- Main Content -->
+                    <div class="note-content mb-4">
+                        <h4><i class="fas fa-book-open"></i> Content</h4>
+                        {{ note.content|safe }}
+                    </div>
+
+                    <!-- Key Points -->
+                    {% if note.key_points %}
+                    <div class="alert alert-primary mb-4">
+                        <h5><i class="fas fa-list-ul"></i> Key Points to Remember</h5>
+                        <div style="white-space: pre-line;">{{ note.key_points }}</div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Exam Tips -->
+                    {% if note.exam_tips %}
+                    <div class="alert alert-success mb-4">
+                        <h5><i class="fas fa-lightbulb"></i> Exam Tips & Tricks</h5>
+                        {{ note.exam_tips|safe }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Common Mistakes -->
+                    {% if note.common_mistakes %}
+                    <div class="alert alert-warning mb-4">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Common Mistakes to Avoid</h5>
+                        <div style="white-space: pre-line;">{{ note.common_mistakes }}</div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Timestamps -->
+                    <div class="text-muted small mt-4">
+                        <i class="fas fa-calendar-plus"></i> Created: {{ note.created_at|date:"F d, Y" }}
+                        {% if note.updated_at != note.created_at %}
+                        | <i class="fas fa-calendar-check"></i> Updated: {{ note.updated_at|date:"F d, Y" }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-between mb-4">
+                <a href="{% url 'notes:topic_detail' subject.slug topic.slug %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back to {{ topic.title }}
+                </a>
+                <form action="{% url 'notes:toggle_bookmark' note.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-bookmark"></i>
+                        {% if is_bookmarked %}Remove Bookmark{% else %}Add to Bookmarks{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Related Notes -->
+            {% if related_notes %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-link"></i> Related Notes</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for related in related_notes %}
+                    <a href="{% url 'notes:note_detail' subject.slug topic.slug related.slug %}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ related.title|truncatewords:8 }}</h6>
+                                <small class="text-muted">
+                                    <span class="badge badge-difficulty-{{ related.difficulty_level }}">
+                                        {{ related.get_difficulty_level_display }}
+                                    </span>
+                                    <span class="importance-stars">{{ related.get_importance_stars }}</span>
+                                </small>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Stats -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Quick Stats</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Difficulty:</strong>
+                        <span class="badge badge-difficulty-{{ note.difficulty_level }}">
+                            {{ note.get_difficulty_level_display }}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Importance:</strong>
+                        <span class="importance-stars">{{ note.get_importance_stars }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Read Time:</strong> {{ note.estimated_read_time }} minutes
+                    </div>
+                    <div>
+                        <strong>Views:</strong> {{ note.views_count }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Tips -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-graduation-cap"></i> Study Tips</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Read the content thoroughly</li>
+                        <li>Focus on key points</li>
+                        <li>Practice exam tips regularly</li>
+                        <li>Avoid common mistakes</li>
+                        <li>Revise multiple times</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

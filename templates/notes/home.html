@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}AnveshAI - MPSC Exam Preparation Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 mb-3">
+            <i class="fas fa-graduation-cap"></i> Welcome to AnveshAI
+        </h1>
+        <p class="lead mb-4">
+            Your comprehensive platform for MPSC exam preparation with exam-oriented short notes
+        </p>
+        
+        <!-- Search Box -->
+        <div class="search-box">
+            <form action="{% url 'notes:search' %}" method="get" class="d-flex">
+                <input type="text" name="q" class="form-control form-control-lg me-2" 
+                       placeholder="Search notes, topics, or subjects..." required>
+                <button type="submit" class="btn btn-light btn-lg">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Subjects Section -->
+    <section class="mb-5">
+        <h2 class="mb-4">
+            <i class="fas fa-book"></i> Available Subjects
+        </h2>
+        <div class="row g-4">
+            {% for subject in subjects %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {% if subject.icon %}
+                            <i class="{{ subject.icon }}"></i>
+                            {% else %}
+                            <i class="fas fa-book-open"></i>
+                            {% endif %}
+                            {{ subject.name }}
+                        </h5>
+                        <p class="card-text text-muted">{{ subject.description|truncatewords:20 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">
+                                {{ subject.notes_count }} Notes
+                            </span>
+                            <a href="{% url 'notes:subject_detail' subject.slug %}" class="btn btn-sm btn-outline-primary">
+                                Explore <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No subjects available yet. Check back soon!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Recent Notes Section -->
+    {% if recent_notes %}
+    <section class="mb-5">
+        <h2 class="mb-4">
+            <i class="fas fa-clock"></i> Recently Added Notes
+        </h2>
+        <div class="row g-4">
+            {% for note in recent_notes %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge badge-difficulty-{{ note.difficulty_level }}">
+                                {{ note.get_difficulty_level_display }}
+                            </span>
+                            <span class="importance-stars">
+                                {{ note.get_importance_stars }}
+                            </span>
+                        </div>
+                        <h6 class="card-title">{{ note.title }}</h6>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-folder"></i> {{ note.topic.subject.name }} › {{ note.topic.title }}
+                        </p>
+                        <p class="card-text small text-muted">
+                            <i class="fas fa-clock"></i> {{ note.estimated_read_time }} min read
+                        </p>
+                        <a href="{% url 'notes:note_detail' note.topic.subject.slug note.topic.slug note.slug %}" 
+                           class="btn btn-sm btn-primary w-100">
+                            Read Note <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Hot Topics Section -->
+    {% if hot_topics %}
+    <section class="mb-5">
+        <h2 class="mb-4">
+            <i class="fas fa-fire text-danger"></i> Hot Topics
+            <span class="hot-topic-badge">Based on PYQs</span>
+        </h2>
+        <div class="row g-4">
+            {% for topic in hot_topics %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-fire text-danger"></i> {{ topic.title }}
+                        </h6>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-book"></i> {{ topic.subject.name }}
+                        </p>
+                        <p class="card-text small">{{ topic.description|truncatewords:15 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-danger">
+                                Appeared {{ topic.frequency }}x in PYQs
+                            </span>
+                            {% if topic.last_appeared_year %}
+                            <span class="text-muted small">
+                                Last: {{ topic.last_appeared_year }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'notes:hot_topics' %}" class="btn btn-outline-danger">
+                View All Hot Topics <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Features Section -->
+    <section class="mb-5">
+        <h2 class="mb-4 text-center">
+            <i class="fas fa-star"></i> Why Choose AnveshAI?
+        </h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Exam-Oriented Notes</h5>
+                        <p class="card-text">Concise, focused notes designed specifically for MPSC exams</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-fire fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">Hot Topics</h5>
+                        <p class="card-text">Identify important topics based on previous year questions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-bookmark fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Easy Bookmarking</h5>
+                        <p class="card-text">Save and organize your favorite notes for quick access</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

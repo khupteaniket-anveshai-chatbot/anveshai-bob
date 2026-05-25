@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4"><i class="fas fa-search"></i> Search Results</h2>
+
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control" 
+                           placeholder="Search notes..." value="{{ query }}" required>
+                </div>
+                <div class="col-md-2">
+                    <select name="subject" class="form-select">
+                        <option value="">All Subjects</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.slug }}" {% if current_subject == subject.slug %}selected{% endif %}>
+                            {{ subject.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="difficulty" class="form-select">
+                        <option value="">All Levels</option>
+                        <option value="easy" {% if current_difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                        <option value="medium" {% if current_difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="hard" {% if current_difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    {% if query %}
+    <div class="alert alert-info">
+        Found <strong>{{ total_results }}</strong> result(s) for "<strong>{{ query }}</strong>"
+    </div>
+    {% endif %}
+
+    <!-- Results -->
+    {% if page_obj %}
+    <div class="row g-4 mb-4">
+        {% for note in page_obj %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge badge-difficulty-{{ note.difficulty_level }}">
+                            {{ note.get_difficulty_level_display }}
+                        </span>
+                        <span class="importance-stars">{{ note.get_importance_stars }}</span>
+                    </div>
+                    <h6 class="card-title">{{ note.title }}</h6>
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-folder"></i> {{ note.topic.subject.name }} › {{ note.topic.title }}
+                    </p>
+                    <p class="card-text small text-muted">
+                        <i class="fas fa-clock"></i> {{ note.estimated_read_time }} min
+                    </p>
+                    <a href="{% url 'notes:note_detail' note.topic.subject.slug note.topic.slug note.slug %}" 
+                       class="btn btn-sm btn-primary w-100">
+                        Read Note <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}{% if current_subject %}&subject={{ current_subject }}{% endif %}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}{% if current_subject %}&subject={{ current_subject }}{% endif %}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> No results found. Try different keywords or filters.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

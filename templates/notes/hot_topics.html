@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Hot Topics - AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="text-center mb-4">
+        <h2><i class="fas fa-fire text-danger"></i> Hot Topics</h2>
+        <p class="lead text-muted">Important topics based on Previous Year Questions (PYQ) analysis</p>
+    </div>
+
+    <!-- Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Filter by Subject</label>
+                    <select name="subject" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Subjects</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.slug }}" {% if current_subject == subject.slug %}selected{% endif %}>
+                            {{ subject.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <a href="{% url 'notes:hot_topics' %}" class="btn btn-secondary w-100">
+                        <i class="fas fa-redo"></i> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hot Topics List -->
+    {% if hot_topics %}
+    <div class="row g-4">
+        {% for topic in hot_topics %}
+        <div class="col-md-6">
+            <div class="card h-100 border-danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title">
+                            <i class="fas fa-fire text-danger"></i> {{ topic.title }}
+                        </h5>
+                        <span class="hot-topic-badge">HOT</span>
+                    </div>
+                    
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-book"></i> {{ topic.subject.name }}
+                    </p>
+                    
+                    <p class="card-text">{{ topic.description }}</p>
+                    
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="alert alert-danger mb-0 py-2">
+                                <strong>{{ topic.frequency }}</strong>
+                                <small class="d-block">Times in PYQs</small>
+                            </div>
+                        </div>
+                        {% if topic.last_appeared_year %}
+                        <div class="col-6">
+                            <div class="alert alert-warning mb-0 py-2">
+                                <strong>{{ topic.last_appeared_year }}</strong>
+                                <small class="d-block">Last Appeared</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if topic.related_notes.all %}
+                    <div class="mb-2">
+                        <strong class="small">Related Notes:</strong>
+                        <div class="mt-2">
+                            {% for note in topic.related_notes.all|slice:":3" %}
+                            <a href="{% url 'notes:note_detail' note.topic.subject.slug note.topic.slug note.slug %}" 
+                               class="btn btn-sm btn-outline-primary mb-1">
+                                {{ note.title|truncatewords:5 }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle fa-3x mb-3"></i>
+        <h5>Hot Topics Coming Soon!</h5>
+        <p class="mb-0">We're analyzing Previous Year Questions to identify the most important topics. Check back soon!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

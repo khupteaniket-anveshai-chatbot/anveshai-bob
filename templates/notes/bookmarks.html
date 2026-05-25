@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookmarks - AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4"><i class="fas fa-bookmark"></i> My Bookmarks</h2>
+
+    {% if bookmarked_notes %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> You have <strong>{{ bookmarked_notes.count }}</strong> bookmarked note(s)
+    </div>
+
+    <div class="row g-4">
+        {% for note in bookmarked_notes %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge badge-difficulty-{{ note.difficulty_level }}">
+                            {{ note.get_difficulty_level_display }}
+                        </span>
+                        <span class="importance-stars">{{ note.get_importance_stars }}</span>
+                    </div>
+                    <h6 class="card-title">{{ note.title }}</h6>
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-folder"></i> {{ note.topic.subject.name }} › {{ note.topic.title }}
+                    </p>
+                    <p class="card-text small text-muted mb-3">
+                        <i class="fas fa-clock"></i> {{ note.estimated_read_time }} min
+                        <i class="fas fa-eye ms-2"></i> {{ note.views_count }} views
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'notes:note_detail' note.topic.subject.slug note.topic.slug note.slug %}" 
+                           class="btn btn-sm btn-primary flex-grow-1">
+                            Read <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <form action="{% url 'notes:toggle_bookmark' note.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" title="Remove bookmark">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> You haven't bookmarked any notes yet.
+        <a href="{% url 'notes:home' %}" class="alert-link">Start exploring notes</a> to bookmark your favorites!
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

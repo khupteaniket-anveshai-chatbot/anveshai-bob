@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}How to Use AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-question-circle text-primary"></i> How to Use AnveshAI
+                </h1>
+                <p class="lead text-muted">Get the most out of your MPSC exam preparation</p>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                            1
+                        </div>
+                        <h3 class="mb-0">Browse Subjects</h3>
+                    </div>
+                    <p class="card-text">
+                        Start by exploring available subjects from the home page. Currently, we're focusing on 
+                        <strong>Science</strong>, with more subjects coming soon. Click on any subject to see 
+                        all available topics.
+                    </p>
+                    <a href="{% url 'notes:home' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-home"></i> Go to Home
+                    </a>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                            2
+                        </div>
+                        <h3 class="mb-0">Select Topics</h3>
+                    </div>
+                    <p class="card-text">
+                        Within each subject, you'll find various topics (e.g., Physics, Chemistry, Biology for Science). 
+                        Each topic contains multiple notes organized by difficulty and importance.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                            3
+                        </div>
+                        <h3 class="mb-0">Filter & Find Notes</h3>
+                    </div>
+                    <p class="card-text">
+                        Use filters to find notes based on:
+                    </p>
+                    <ul>
+                        <li><strong>Difficulty:</strong> Easy, Medium, or Hard</li>
+                        <li><strong>Importance:</strong> 1 to 5 stars (⭐ to ⭐⭐⭐⭐⭐)</li>
+                        <li><strong>Tags:</strong> Specific topics or categories</li>
+                    </ul>
+                    <p class="card-text">
+                        This helps you focus on notes that match your current preparation level and priorities.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                            4
+                        </div>
+                        <h3 class="mb-0">Study the Notes</h3>
+                    </div>
+                    <p class="card-text">
+                        Each note contains:
+                    </p>
+                    <ul>
+                        <li><strong>Main Content:</strong> Comprehensive explanation of the topic</li>
+                        <li><strong>Key Points:</strong> Quick bullet points for revision</li>
+                        <li><strong>Exam Tips:</strong> Strategies and tricks for exam success</li>
+                        <li><strong>Common Mistakes:</strong> What to avoid during exams</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                            5
+                        </div>
+                        <h3 class="mb-0">Bookmark Important Notes</h3>
+                    </div>
+                    <p class="card-text">
+                        Click the <span class="badge bg-danger"><i class="fas fa-bookmark"></i> Bookmark</span> 
+                        button on any note to save it for quick access later. View all your bookmarked notes 
+                        from the Bookmarks page in the navigation menu.
+                    </p>
+                    <a href="{% url 'notes:bookmarks' %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-bookmark"></i> View Bookmarks
+                    </a>
+                </div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                            6
+                        </div>
+                        <h3 class="mb-0">Use Search Feature</h3>
+                    </div>
+                    <p class="card-text">
+                        Can't find what you're looking for? Use the search feature to find notes across all 
+                        subjects and topics. You can search by keywords, topics, or specific content.
+                    </p>
+                    <a href="{% url 'notes:search' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-search"></i> Search Notes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                            7
+                        </div>
+                        <h3 class="mb-0">Check Hot Topics</h3>
+                    </div>
+                    <p class="card-text">
+                        Visit the Hot Topics section to see which topics appear most frequently in Previous 
+                        Year Questions (PYQs). This helps you prioritize your preparation and focus on 
+                        high-yield topics.
+                    </p>
+                    <a href="{% url 'notes:hot_topics' %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-fire"></i> View Hot Topics
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="fas fa-lightbulb text-warning"></i> Pro Tips</h3>
+                    <ul class="mb-0">
+                        <li>Start with high-importance (⭐⭐⭐⭐⭐) topics first</li>
+                        <li>Focus on exam tips and common mistakes sections</li>
+                        <li>Bookmark notes you need to revise multiple times</li>
+                        <li>Use filters to create custom study sessions</li>
+                        <li>Check hot topics regularly to stay updated on important areas</li>
+                        <li>Revise key points before exams for quick recall</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <h4 class="mb-4">Ready to Start?</h4>
+                <a href="{% url 'notes:home' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket"></i> Start Learning Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
