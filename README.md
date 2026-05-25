@@ -402,3 +402,88 @@ This project is for educational purposes.
 **Version:** 1.0.0  
 **Last Updated:** May 2024  
 **Developed for:** MPSC Aspirants
+
+## Git Workflow
+
+### Branch Strategy
+
+We follow a two-branch workflow:
+- **`main`** - Production-ready code (stable releases only)
+- **`develop`** - Development branch (active development)
+
+### Current Branch
+You are currently on: **`develop`** branch
+
+### Working with Branches
+
+#### Check Current Branch
+```bash
+git branch
+```
+
+#### Switch to Develop Branch (for development)
+```bash
+git checkout develop
+```
+
+#### Switch to Main Branch (for releases)
+```bash
+git checkout main
+```
+
+### Development Workflow
+
+#### 1. Make Changes on Develop Branch
+```bash
+# Ensure you're on develop
+git checkout develop
+
+# Make your changes to files
+# ...
+
+# Stage changes
+git add .
+
+# Commit changes
+git commit -m "Description of changes"
+
+# Push to develop branch
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_anveshai' git push origin develop
+```
+
+#### 2. Merge Develop to Main (After Testing)
+```bash
+# Switch to main branch
+git checkout main
+
+# Merge develop into main
+git merge develop
+
+# Push to main branch
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_anveshai' git push origin main
+
+# Switch back to develop for continued development
+git checkout develop
+```
+
+### Quick Commands
+
+#### Commit and Push to Develop
+```bash
+git add .
+git commit -m "Your commit message"
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_anveshai' git push origin develop
+```
+
+#### View Branch Status
+```bash
+git status
+git branch -a
+```
+
+#### View Commit History
+```bash
+git log --oneline --graph --all
+```
+
+---
