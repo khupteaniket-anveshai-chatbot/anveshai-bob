@@ -306,6 +306,126 @@ Visit: `http://127.0.0.1:8000/`
 - `/about/` - About page
 - `/how-to-use/` - How to use guide
 
+## 📚 Importing Notes from DOCX Files
+
+### Overview
+AnveshAI includes a powerful generic DOCX import system that allows you to import study notes from Microsoft Word documents directly into the database. This system automatically parses the document structure and creates organized notes.
+
+### File Structure
+```
+AnveshAI-Updated/
+├── notes-source/              # Place your DOCX files here
+│   └── 01. Cell.docx         # Example: Cell Biology notes
+├── utils/                     # Utility modules
+│   └── docx_reader.py        # DOCX reading and parsing utility
+└── notes/management/commands/
+    └── import_docx_notes.py  # Generic import command
+```
+
+### Prerequisites
+The `python-docx` package is already included in `requirements.txt` and will be installed automatically.
+
+### How to Import Notes
+
+#### Step 1: Prepare Your DOCX File
+1. Place your DOCX file in the `notes-source/` directory
+2. Organize content with clear headings and sections
+3. Use bold text or heading styles for section titles
+
+#### Step 2: Preview Import (Dry Run)
+Before importing, preview what will be imported:
+```bash
+python manage.py import_docx_notes "filename.docx" --dry-run
+```
+
+Example:
+```bash
+python manage.py import_docx_notes "01. Cell.docx" --dry-run
+```
+
+This will show:
+- Number of sections found
+- Preview of first 5 lines of each section
+- Total paragraphs in document
+
+#### Step 3: Import with Default Settings
+```bash
+python manage.py import_docx_notes "filename.docx"
+```
+
+This will:
+- Create/use "Science" subject (default)
+- Create topic from filename (e.g., "Cell" from "01. Cell.docx")
+- Set difficulty to "medium"
+- Set importance to 3 (out of 5)
+
+#### Step 4: Import with Custom Settings
+```bash
+python manage.py import_docx_notes "filename.docx" \
+  --subject "History" \
+  --topic "Ancient India" \
+  --difficulty hard \
+  --importance 5
+```
+
+### Command Options
+
+| Option | Description | Default | Choices |
+|--------|-------------|---------|---------|
+| `filename` | Name of DOCX file in notes-source/ | Required | - |
+| `--subject` | Subject name | Science | Any string |
+| `--topic` | Topic name | Filename without extension | Any string |
+| `--difficulty` | Difficulty level | medium | easy, medium, hard |
+| `--importance` | Importance rating | 3 | 1, 2, 3, 4, 5 |
+| `--dry-run` | Preview without importing | False | - |
+
+### Examples
+
+**Import Cell Biology notes:**
+```bash
+python manage.py import_docx_notes "01. Cell.docx" \
+  --subject "Science" \
+  --topic "Cell Biology" \
+  --importance 5
+```
+
+**Import History notes:**
+```bash
+python manage.py import_docx_notes "02. Ancient India.docx" \
+  --subject "History" \
+  --topic "Ancient Indian History" \
+  --difficulty hard \
+  --importance 4
+```
+
+**Preview Geography notes:**
+```bash
+python manage.py import_docx_notes "03. Indian Geography.docx" --dry-run
+```
+
+### What Gets Imported
+
+For each section in your DOCX file, the system creates:
+- **Title**: Section heading
+- **Content**: Formatted as HTML with paragraphs, lists, and headings
+- **Key Points**: Automatically extracted from bullet points and short lines
+- **Tags**: Automatically tagged as "Important" and "Basic Concept" (if applicable)
+- **Read Time**: Calculated based on word count (~200 words/minute)
+
+### Viewing Imported Notes
+
+1. Start the Django server: `python manage.py runserver`
+2. Visit: `http://127.0.0.1:8000/`
+3. Navigate to: Subject → Topic → View all notes
+
+### Tips for Best Results
+
+1. **Use Clear Headings**: Bold text or heading styles help identify sections
+2. **Organize Content**: Group related information under headings
+3. **Use Bullet Points**: They're automatically extracted as key points
+4. **Keep Sections Focused**: Each section becomes a separate note
+5. **Test with Dry Run**: Always preview before importing
+
 ## Adding Your Own Notes
 
 ### Method 1: Using Admin Panel (Recommended)
@@ -427,6 +547,74 @@ This project is for educational purposes.
 **Developed for:** MPSC Aspirants
 
 ## Git Workflow
+
+### 🔑 SSH Key Configuration
+
+**Important**: This project uses a specific SSH key for GitHub authentication.
+
+#### SSH Key Details
+- **Key Name**: `id_ed25519_anveshai`
+- **Location**: `~/.ssh/id_ed25519_anveshai`
+- **Public Key**: `~/.ssh/id_ed25519_anveshai.pub`
+- **Email**: `khupteaniket.anveshai@gmail.com`
+- **Fingerprint**: `SHA256:248IovuqBJagOMTeBrv0ck7UG1VdxSMTgWd0tTZO4N0`
+
+#### Adding SSH Key to Agent
+Before pushing to GitHub, ensure the SSH key is added to your SSH agent:
+
+```bash
+# Add the anveshai SSH key
+ssh-add ~/.ssh/id_ed25519_anveshai
+
+# Verify it's added
+ssh-add -l
+```
+
+#### Using SSH Key with Git Commands
+All git push/pull commands should use this specific SSH key:
+
+```bash
+# Method 1: Using GIT_SSH_COMMAND (Recommended)
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_anveshai' git push origin develop
+
+# Method 2: Add to SSH agent first, then push normally
+ssh-add ~/.ssh/id_ed25519_anveshai
+git push origin develop
+```
+
+#### Troubleshooting SSH Issues
+
+**Issue: Permission denied**
+```bash
+# Check if key is in SSH agent
+ssh-add -l
+
+# If not listed, add it
+ssh-add ~/.ssh/id_ed25519_anveshai
+
+# Test GitHub connection
+ssh -T git@github.com
+```
+
+**Issue: Wrong key being used**
+```bash
+# Remove all keys from agent
+ssh-add -D
+
+# Add only the anveshai key
+ssh-add ~/.ssh/id_ed25519_anveshai
+
+# Verify
+ssh-add -l
+```
+
+**Issue: Key not found**
+```bash
+# Check if key exists
+ls -la ~/.ssh/id_ed25519_anveshai
+
+# If missing, contact admin or regenerate key
+```
 
 ### Branch Strategy
 
