@@ -65,6 +65,29 @@ AnveshAI-Updated/
 
 ## Installation & Setup
 
+
+### 🔒 Main Branch Protection
+
+The `main` branch is protected from accidental commits using a Git pre-commit hook.
+
+**What happens if you try to commit to main:**
+```
+🚫 ERROR: Direct commits to 'main' branch are not allowed!
+
+Please follow the proper workflow:
+1. Switch to develop branch: git checkout develop
+2. Make your changes and commit
+3. Push to develop: git push origin develop
+4. After testing, merge develop to main
+```
+
+**To bypass (not recommended):**
+```bash
+git commit --no-verify
+```
+
+**Protection is active:** ✅ Prevents accidental commits to main branch
+
 ### Prerequisites
 - Python 3.8 or higher
 - pip (Python package manager)
