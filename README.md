@@ -109,6 +109,79 @@ python manage.py populate_science_data
 python manage.py runserver
 ```
 
+
+## Server Management
+
+### 🚀 Starting the Server
+
+#### Method 1: Start in Terminal (Recommended)
+```bash
+cd /Users/aniketkhupte/Documents/AnveshAI-Updated
+source venv/bin/activate
+python manage.py runserver
+```
+
+The server will start on: **http://127.0.0.1:8000/**
+
+#### Method 2: Start in Background
+```bash
+cd /Users/aniketkhupte/Documents/AnveshAI-Updated
+source venv/bin/activate
+nohup python manage.py runserver > server.log 2>&1 &
+```
+
+### 🛑 Stopping the Server
+
+#### Method 1: If Running in Terminal
+Press: **`Ctrl + C`** (or `Command + C` on Mac)
+
+#### Method 2: If Running in Background
+```bash
+# Find the process
+ps aux | grep "manage.py runserver" | grep -v grep
+
+# Kill the process (replace PID with actual process ID)
+kill -9 <PID>
+```
+
+#### Method 3: Quick Stop Script
+```bash
+# Stop all Django servers
+pkill -f "manage.py runserver"
+```
+
+### 🔄 Restarting the Server
+
+```bash
+# Stop
+pkill -f "manage.py runserver"
+
+# Wait a moment
+sleep 2
+
+# Start
+cd /Users/aniketkhupte/Documents/AnveshAI-Updated
+source venv/bin/activate
+python manage.py runserver
+```
+
+### 📋 Check Server Status
+
+```bash
+# Check if server is running
+ps aux | grep "manage.py runserver" | grep -v grep
+
+# Check which port is in use
+lsof -i :8000
+```
+
+### 💡 Server Management Tips
+
+1. **Keep Terminal Open**: When you start the server in terminal, keep that terminal window open
+2. **Check Logs**: If server doesn't start, check for error messages in the terminal
+3. **Port Already in Use**: If you get "port already in use" error, stop existing server first
+4. **Auto-Reload**: Django automatically reloads when you change code files
+
 Visit: `http://127.0.0.1:8000/`
 
 ## Usage Guide
