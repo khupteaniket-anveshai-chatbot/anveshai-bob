@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import views_import
 
 app_name = 'notes'
 
@@ -27,6 +28,11 @@ urlpatterns = [
     # Static pages
     path('about/', views.about, name='about'),
     path('how-to-use/', views.how_to_use, name='how_to_use'),
+    
+    # Notes Import (Admin)
+    path('admin/import/', views_import.import_notes_form, name='import_form'),
+    path('admin/import/review/<int:session_id>/', views_import.import_review, name='import_review'),
+    path('admin/import/sessions/', views_import.import_sessions_list, name='import_sessions'),
 ]
 
 # Made with Bob

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Import Notes - AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-file-import"></i> Import Notes</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Paste your raw notes below. The system will automatically format them for review.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="subject_name" class="form-label">Subject Name</label>
+                            <input type="text" class="form-control" id="subject_name" name="subject_name" 
+                                   placeholder="e.g., Science, History, Geography" required>
+                            <small class="form-text text-muted">Enter the subject these notes belong to</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="topic_name" class="form-label">Topic Name</label>
+                            <input type="text" class="form-control" id="topic_name" name="topic_name" 
+                                   placeholder="e.g., Cell Biology, Ancient India" required>
+                            <small class="form-text text-muted">Enter the specific topic</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="raw_notes" class="form-label">Raw Notes</label>
+                            <textarea class="form-control" id="raw_notes" name="raw_notes" rows="20" 
+                                      placeholder="Paste your notes here..." required></textarea>
+                            <small class="form-text text-muted">
+                                <strong>Tips:</strong>
+                                <ul class="mt-2">
+                                    <li>Use clear headings for each topic</li>
+                                    <li>Use bullet points (•, -, *) for key points</li>
+                                    <li>Mark extra information with "Extra:" prefix</li>
+                                    <li>Keep sections organized and focused</li>
+                                </ul>
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic"></i> Format & Preview Notes
+                            </button>
+                            <a href="{% url 'admin:notes_notesimportsession_changelist' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Import Sessions
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Example Format</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded"><code>Cell Theory
+Given by Matthias Schleiden and Theodor Schwann
+• Cell is the structural and functional unit of life
+• All organisms are made of cells
+• All cells arise from pre-existing cells
+
+Extra: Schleiden worked on plants, Schwann worked on animals
+
+Prokaryotic Cell
+Nucleus is absent
+Generally unicellular organisms
+• Examples: Bacteria, Archaea
+• Ribosome size: 70S</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Subject, Topic, Tag, Note, HotTopic
+from django.urls import reverse
+from django.utils.html import format_html
+from .models import Subject, Topic, Tag, Note, HotTopic, NotesImportSession
 
 
 @admin.register(Subject)
@@ -114,6 +116,60 @@ class HotTopicAdmin(admin.ModelAdmin):
             'fields': ('is_active',)
         }),
     )
+
+
+@admin.register(NotesImportSession)
+class NotesImportSessionAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'subject_name',
+        'topic_name',
+        'notes_count',
+        'status',
+        'created_at',
+        'action_buttons'
+    ]
+    list_filter = ['status', 'created_at', 'subject_name']
+    search_fields = ['subject_name', 'topic_name', 'raw_notes']
+    readonly_fields = ['formatted_notes', 'notes_count', 'created_at', 'updated_at', 'imported_at']
+    
+    fieldsets = (
+        ('Import Information', {
+            'fields': ('subject_name', 'topic_name', 'status')
+        }),
+        ('Raw Notes', {
+            'fields': ('raw_notes',),
+            'classes': ('collapse',)
+        }),
+        ('Formatted Notes', {
+            'fields': ('formatted_notes', 'notes_count'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'imported_at'),
+        }),
+    )
+    
+    ordering = ['-created_at']
+    
+    def action_buttons(self, obj):
+        if obj.status == 'pending':
+            review_url = reverse('notes:import_review', args=[obj.id])
+            return format_html(
+                '<a class="button" href="{}">Review & Import</a>',
+                review_url
+            )
+        elif obj.status == 'imported':
+            return format_html('<span style="color: green;">✓ Imported</span>')
+        elif obj.status == 'rejected':
+            return format_html('<span style="color: red;">✗ Rejected</span>')
+        return '-'
+    
+    action_buttons.short_description = 'Actions'
+    
+    def has_add_permission(self, request):
+        # Disable add button in admin, use custom form instead
+        return False
 
 
 # Customize admin site header and title

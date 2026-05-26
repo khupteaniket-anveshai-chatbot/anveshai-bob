@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Review Notes - AnveshAI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-11 mx-auto">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-check-circle"></i> Review Formatted Notes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Subject:</strong> {{ session.subject_name }} | 
+                        <strong>Topic:</strong> {{ session.topic_name }} | 
+                        <strong>Notes Found:</strong> {{ session.notes_count }}
+                    </div>
+                    
+                    <p class="text-muted">Review the formatted notes below. You can edit any field before importing to the database.</p>
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for note in formatted_notes %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0">Note {{ forloop.counter }} of {{ formatted_notes|length }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="title_{{ forloop.counter0 }}" class="form-label"><strong>Title</strong></label>
+                            <input type="text" class="form-control" id="title_{{ forloop.counter0 }}" 
+                                   name="title_{{ forloop.counter0 }}" value="{{ note.title }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content_{{ forloop.counter0 }}" class="form-label"><strong>Content (HTML)</strong></label>
+                            <textarea class="form-control" id="content_{{ forloop.counter0 }}" 
+                                      name="content_{{ forloop.counter0 }}" rows="8" required>{{ note.content }}</textarea>
+                            <small class="form-text text-muted">HTML formatted content</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Content Preview</strong></label>
+                            <div class="border p-3 bg-light rounded">
+                                {{ note.content|safe }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="key_points_{{ forloop.counter0 }}" class="form-label"><strong>Key Points</strong></label>
+                            <textarea class="form-control" id="key_points_{{ forloop.counter0 }}" 
+                                      name="key_points_{{ forloop.counter0 }}" rows="4">{{ note.key_points }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="difficulty_{{ forloop.counter0 }}" class="form-label"><strong>Difficulty</strong></label>
+                                <select class="form-select" id="difficulty_{{ forloop.counter0 }}" 
+                                        name="difficulty_{{ forloop.counter0 }}">
+                                    <option value="easy" {% if note.difficulty_level == 'easy' %}selected{% endif %}>Easy</option>
+                                    <option value="medium" {% if note.difficulty_level == 'medium' %}selected{% endif %}>Medium</option>
+                                    <option value="hard" {% if note.difficulty_level == 'hard' %}selected{% endif %}>Hard</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="importance_{{ forloop.counter0 }}" class="form-label"><strong>Importance (1-5)</strong></label>
+                                <select class="form-select" id="importance_{{ forloop.counter0 }}" 
+                                        name="importance_{{ forloop.counter0 }}">
+                                    <option value="1" {% if note.importance_rating == 1 %}selected{% endif %}>⭐ Low</option>
+                                    <option value="2" {% if note.importance_rating == 2 %}selected{% endif %}>⭐⭐ Medium</option>
+                                    <option value="3" {% if note.importance_rating == 3 %}selected{% endif %}>⭐⭐⭐ High</option>
+                                    <option value="4" {% if note.importance_rating == 4 %}selected{% endif %}>⭐⭐⭐⭐ Very High</option>
+                                    <option value="5" {% if note.importance_rating == 5 %}selected{% endif %}>⭐⭐⭐⭐⭐ Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="mb-3">Actions</h5>
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="edit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <button type="submit" name="action" value="approve" class="btn btn-success btn-lg">
+                                <i class="fas fa-check"></i> Approve & Import to Database
+                            </button>
+                            <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg">
+                                <i class="fas fa-times"></i> Reject & Discard
+                            </button>
+                            <a href="{% url 'notes:import_form' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Back to Form
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

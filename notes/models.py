@@ -178,4 +178,32 @@ class HotTopic(models.Model):
     def __str__(self):
         return f"{self.subject.name} - {self.title}"
 
+
+class NotesImportSession(models.Model):
+    """Model to store temporary notes import sessions"""
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('imported', 'Imported'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    subject_name = models.CharField(max_length=100)
+    topic_name = models.CharField(max_length=200)
+    raw_notes = models.TextField(help_text="Paste your raw notes here")
+    formatted_notes = models.JSONField(blank=True, null=True, help_text="Auto-formatted notes data")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    imported_at = models.DateTimeField(blank=True, null=True)
+    notes_count = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Notes Import Session'
+        verbose_name_plural = 'Notes Import Sessions'
+    
+    def __str__(self):
+        return f"{self.subject_name} - {self.topic_name} ({self.status})"
+
 # Made with Bob
