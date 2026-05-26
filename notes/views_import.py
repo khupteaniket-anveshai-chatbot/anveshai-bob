@@ -111,17 +111,35 @@ def format_raw_notes(raw_text):
     notes = []
     lines = raw_text.strip().split('\n')
     current_note = None
-    current_section = None
+    current_section = 'content'
     
-    for line in lines:
+    for i, line in enumerate(lines):
         line = line.strip()
         if not line:
             continue
         
-        # Check if it's a main heading (short line, no ending punctuation except :)
-        if is_heading(line):
+        # More aggressive heading detection
+        is_likely_heading = False
+        
+        # Check if it's a heading based on multiple criteria
+        if len(line) < 100:  # Headings are usually short
+            # Check if next line exists and is content (not another short line)
+            if i + 1 < len(lines):
+                next_line = lines[i + 1].strip()
+                if next_line and len(next_line) > len(line):
+                    is_likely_heading = True
+            
+            # Or if it's very short (< 50 chars) and doesn't end with punctuation
+            if len(line) < 50 and not line.endswith(('.', ',', ';')):
+                is_likely_heading = True
+            
+            # Or if it ends with colon
+            if line.endswith(':'):
+                is_likely_heading = True
+        
+        if is_likely_heading and not line.lower().startswith('extra'):
             # Save previous note
-            if current_note and current_note.get('title'):
+            if current_note and (current_note.get('content') or current_note.get('key_points')):
                 notes.append(current_note)
             
             # Start new note
@@ -146,7 +164,11 @@ def format_raw_notes(raw_text):
             
             # Add content to appropriate section
             if current_section == 'content':
-                current_note['content'].append(line)
+                # Auto-detect bullet points in content
+                if line.startswith('•') or line.startswith('-') or line.startswith('*'):
+                    current_note['key_points'].append(line.lstrip('•-* '))
+                else:
+                    current_note['content'].append(line)
             elif current_section == 'key_points':
                 if line.startswith('•') or line.startswith('-') or line.startswith('*'):
                     current_note['key_points'].append(line.lstrip('•-* '))
@@ -154,19 +176,32 @@ def format_raw_notes(raw_text):
                     current_note['key_points'].append(line)
             elif current_section == 'extra_info':
                 current_note['extra_info'].append(line)
+        else:
+            # First line without a note - create one
+            current_note = {
+                'title': line.rstrip(':'),
+                'content': [],
+                'key_points': [],
+                'extra_info': [],
+                'difficulty_level': 'medium',
+                'importance_rating': 3,
+            }
+            current_section = 'content'
     
     # Save last note
-    if current_note and current_note.get('title'):
+    if current_note and (current_note.get('content') or current_note.get('key_points')):
         notes.append(current_note)
     
     # Format notes for display
     formatted_notes = []
     for note in notes:
+        # Combine content and extra info for display
+        all_content = note['content'] + note['extra_info']
+        
         formatted_note = {
             'title': note['title'],
-            'content': format_content_html(note['content']),
-            'key_points': '\n'.join(f"• {point}" for point in note['key_points']),
-            'extra_info': format_content_html(note['extra_info']) if note['extra_info'] else '',
+            'content': format_content_html(all_content),
+            'key_points': '\n'.join(f"• {point}" for point in note['key_points']) if note['key_points'] else '',
             'difficulty_level': note['difficulty_level'],
             'importance_rating': note['importance_rating'],
         }
@@ -262,10 +297,8 @@ def import_notes_to_db(session):
     
     # Import each note
     for note_data in session.formatted_notes:
-        # Combine content and extra info
+        # Use content as-is (already includes extra info)
         full_content = note_data['content']
-        if note_data.get('extra_info'):
-            full_content += f'\n<h4>Extra Information:</h4>\n{note_data["extra_info"]}'
         
         # Calculate read time
         content_length = len(full_content)
