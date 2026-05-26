@@ -426,6 +426,132 @@ For each section in your DOCX file, the system creates:
 4. **Keep Sections Focused**: Each section becomes a separate note
 5. **Test with Dry Run**: Always preview before importing
 
+## 📝 Importing Notes via Chat (Recommended Method)
+
+### Overview
+This is the most efficient method for importing notes. You paste notes in the chat, Bob creates a formatted markdown file for review, and after approval, imports them to the database.
+
+### Workflow
+
+#### Step 1: Paste Your Notes in Chat
+Simply paste your raw notes content in the chat. Format can be:
+- Plain text with headings
+- Bullet points
+- Tables
+- Any structured format
+
+Example:
+```
+Definition
+Cell is the basic structural and functional unit of life.
+Every living organism is made up of cells.
+
+Cell Theory
+Given by Matthias Schleiden and Theodor Schwann.
+• All living organisms are made of cells
+• Cell is the basic unit of life
+```
+
+#### Step 2: Bob Creates Formatted Markdown File
+Bob will automatically:
+1. Parse your notes
+2. Structure them with proper formatting
+3. Add metadata (difficulty, importance, tags)
+4. Create a `.md` file in `notes-formatted/` directory
+
+Example output: `notes-formatted/cell_biology_part1_review.md`
+
+The file will contain:
+- Subject and Topic information
+- Each note with Title, Content, Key Points
+- Difficulty level and Importance rating
+- Proper HTML formatting
+
+#### Step 3: Review the Markdown File
+Open the generated `.md` file and review:
+- Check if content is properly formatted
+- Verify difficulty levels and importance ratings
+- Make any necessary corrections
+- Approve for import
+
+#### Step 4: Import to Database
+After approval, Bob runs the import command:
+
+```bash
+python manage.py import_from_markdown notes-formatted/filename.md --clear-existing --delete-after
+```
+
+**Command Options:**
+- `--clear-existing`: Deletes existing notes for the topic before importing (recommended)
+- `--delete-after`: Automatically deletes the .md file after successful import
+
+#### Step 5: Verify in UI
+Visit `http://127.0.0.1:8000/` and navigate to your subject/topic to see the imported notes.
+
+### Command Reference
+
+**Basic import:**
+```bash
+python manage.py import_from_markdown notes-formatted/cell_biology_part1.md
+```
+
+**Import with cleanup:**
+```bash
+python manage.py import_from_markdown notes-formatted/history_notes.md --clear-existing --delete-after
+```
+
+**Import without deleting file:**
+```bash
+python manage.py import_from_markdown notes-formatted/geography_notes.md --clear-existing
+```
+
+### File Structure
+```
+AnveshAI-Updated/
+├── notes-formatted/           # Temporary markdown files for review
+│   └── *.md                  # Auto-generated, deleted after import
+└── notes/management/commands/
+    └── import_from_markdown.py  # Import command
+```
+
+### Advantages of This Method
+
+1. **Token Efficient**: Notes aren't hardcoded in Python files
+2. **Review Before Import**: You can verify formatting before database insertion
+3. **Flexible**: Works with any note format you paste
+4. **Clean**: Auto-deletes temporary files after import
+5. **Safe**: `--clear-existing` ensures no duplicate or incomplete notes
+
+### Example Session
+
+**You paste:**
+```
+Mitochondria
+Known as the powerhouse of the cell.
+Produces ATP through cellular respiration.
+• Has double membrane
+• Contains its own DNA
+```
+
+**Bob creates:** `notes-formatted/cell_organelles.md`
+
+**You review:** Check the formatted file
+
+**Bob imports:**
+```bash
+python manage.py import_from_markdown notes-formatted/cell_organelles.md --clear-existing --delete-after
+```
+
+**Result:** Note appears in UI, .md file deleted
+
+### Tips for Best Results
+
+1. **Clear Structure**: Use headings to separate different topics
+2. **Bullet Points**: Use • or - for key points
+3. **Tables**: Use markdown table format for comparisons
+4. **Extra Info**: Mark additional information clearly
+5. **Review First**: Always review the .md file before approving import
+
 ## Adding Your Own Notes
 
 ### Method 1: Using Admin Panel (Recommended)
