@@ -213,24 +213,102 @@ class Command(BaseCommand):
         return notes
     
     def convert_markdown_to_html(self, text):
-        """Convert simple markdown to HTML"""
-        # Convert bullet points
-        text = re.sub(r'^- (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
-        text = re.sub(r'(<li>.*</li>)', r'<ul>\n\1\n</ul>', text, flags=re.DOTALL)
-        
-        # Convert bold
-        text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
-        
-        # Convert paragraphs (lines not in lists)
+        """Convert simple markdown to HTML including tables"""
         lines = text.split('\n')
         html_lines = []
-        for line in lines:
-            line = line.strip()
-            if line and not line.startswith('<'):
+        in_table = False
+        table_rows = []
+        
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Check if this is a table line (contains |)
+            if '|' in line and line.count('|') >= 2:
+                if not in_table:
+                    in_table = True
+                    table_rows = []
+                
+                # Skip separator line (|---|---|)
+                if re.match(r'^\|[\s\-|]+\|$', line):
+                    i += 1
+                    continue
+                
+                # Parse table row
+                cells = [cell.strip() for cell in line.split('|')[1:-1]]  # Remove empty first/last
+                table_rows.append(cells)
+                i += 1
+                
+                # Check if next line is still part of table
+                if i < len(lines) and '|' not in lines[i]:
+                    # End of table, convert to HTML
+                    html_lines.append(self.convert_table_to_html(table_rows))
+                    in_table = False
+                    table_rows = []
+                elif i >= len(lines):
+                    # End of content, convert table
+                    html_lines.append(self.convert_table_to_html(table_rows))
+                    in_table = False
+                continue
+            
+            # If we were in a table but this line isn't, close the table
+            if in_table:
+                html_lines.append(self.convert_table_to_html(table_rows))
+                in_table = False
+                table_rows = []
+            
+            # Convert bullet points
+            if line.startswith('- '):
+                html_lines.append(f'<li>{line[2:]}</li>')
+            elif line.startswith('• '):
+                html_lines.append(f'<li>{line[2:]}</li>')
+            # Convert bold
+            elif '**' in line:
+                line = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
+                html_lines.append(f'<p>{line}</p>')
+            # Regular paragraph
+            elif line:
                 html_lines.append(f'<p>{line}</p>')
             else:
-                html_lines.append(line)
+                html_lines.append('')
+            
+            i += 1
         
-        return '\n'.join(html_lines)
+        # Close any remaining table
+        if in_table:
+            html_lines.append(self.convert_table_to_html(table_rows))
+        
+        # Wrap consecutive <li> tags in <ul>
+        result = '\n'.join(html_lines)
+        result = re.sub(r'(<li>.*?</li>\s*)+', lambda m: f'<ul>\n{m.group(0)}\n</ul>', result, flags=re.DOTALL)
+        
+        return result
+    
+    def convert_table_to_html(self, rows):
+        """Convert table rows to HTML table"""
+        if not rows:
+            return ''
+        
+        html = ['<table border="1" style="border-collapse: collapse; width: 100%;">']
+        
+        # First row is header
+        if rows:
+            html.append('<thead><tr>')
+            for cell in rows[0]:
+                html.append(f'<th style="padding: 8px; background-color: #f2f2f2;">{cell}</th>')
+            html.append('</tr></thead>')
+        
+        # Remaining rows are body
+        if len(rows) > 1:
+            html.append('<tbody>')
+            for row in rows[1:]:
+                html.append('<tr>')
+                for cell in row:
+                    html.append(f'<td style="padding: 8px; border: 1px solid #ddd;">{cell}</td>')
+                html.append('</tr>')
+            html.append('</tbody>')
+        
+        html.append('</table>')
+        return '\n'.join(html)
 
 # Made with Bob
